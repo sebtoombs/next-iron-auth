@@ -43,20 +43,14 @@ export default async (req, res, options) => {
 
     const { account, user } = registerResult;
 
-    // On success, merge any extra user data into the session cookie
-    // const user =
-    //   typeof options.sessonData === `function`
-    //     ? await options.sessionData({ account }, req)
-    //     : {};
-    // const userData = {
-    //   ...user,
-    //   isLoggedIn: true,
-    //   account: account[accountIdKey],
-    //   login: account.login,
-    // };
-    // req.session.set("user", userData);
-    // await req.session.save();
-    res.status(200).send({ done: true });
+    await signIn({ account, user, options, req });
+
+    return response({
+      req,
+      res,
+      options,
+      payload: { url: `${options.baseUrl}${options.basePath}/profile` },
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json(error);
