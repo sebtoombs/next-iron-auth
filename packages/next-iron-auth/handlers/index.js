@@ -5,6 +5,7 @@ import user from "./user";
 import callback from "./callback";
 import withSession from "../lib/withSession";
 import register from "./register";
+import error from "./error";
 import parseUrl from "../lib/parseUrl";
 
 function parseAndValidateOptions(options) {
@@ -88,6 +89,9 @@ export default function Auth(options) {
     }
     if (path0 === "callback") {
       return callback(req, res, options);
+    }
+    if (path0 === "error") {
+      return error(req, res, options);
     }
     return res.status(404).end();
   });
