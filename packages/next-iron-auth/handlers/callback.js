@@ -79,31 +79,4 @@ export default async (req, res, options) => {
     options,
     payload: { error: "INVALID_CALLBACK" },
   });
-
-  // const { type = "" } = req.query;
-
-  // if (!type) {
-  //   return res.status(400).json({ code: "INVALID_CALLBACK_TYPE" });
-  // }
-
-  // if (type === "token") {
-  //   const { token = "", action = "" } = req.query;
-  //   if (!token) {
-  //     // return res.status(400).json({code: "MISSING_TOKEN"});
-  //     return res.send("MISSING_TOKEN");
-  //   }
-  //   if (!action) {
-  //     // return res.status(400).json({ code: "MISSING_ACTION" });
-  //     return res.send("MISSING_ACTION");
-  //   }
-
-  //   try {
-  //     const validationResult = await validateToken({ token, options });
-  //     if (!validationResult) {
-  //       return res.send("INVALID_TOKEN");
-  //     }
-  //   } catch (e) {
-  //     return res.send("UNKNOWN_ERROR");
-  //   }
-  // }
 };
