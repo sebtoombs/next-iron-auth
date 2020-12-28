@@ -32,6 +32,7 @@
 	"scripts": {
 		"build": "babel src --root-mode upward -d dist --source-maps",
 		"watch": "babel --watch src --out-dir dist",
-		"prepublishOnly": " npm run build && cp ../../README.md README.md && cp package.json ./dist/package.json"
+		"prepublishOnly": " npm run build && cp ../../README.md README.md && cp package.json ./dist/package.json",
+		"postpublish": "rm -rf dist"
 	}
 }
