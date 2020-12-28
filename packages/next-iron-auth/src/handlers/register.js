@@ -74,9 +74,9 @@ export default async (req, res, options) => {
     await signIn({ account, user, options, req });
 
     const callbackResponse = await applyCallback(
-      "register::register_redirect",
+      "register::register_success",
       [
-        `${options.baseUrl}/profile`,
+        { url: `${options.baseUrl}/profile` },
         { account, user, req, res, provider: "credentials" },
       ],
       options
@@ -86,7 +86,7 @@ export default async (req, res, options) => {
         req,
         res,
         options,
-        payload: { url: callbackResponse },
+        payload: callbackResponse,
       });
     } else {
       return;
