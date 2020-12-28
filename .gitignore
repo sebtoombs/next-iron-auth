@@ -9,3 +9,5 @@ tmp-data
 .env*
 
 dist/
+
+packages/next-iron-auth/README.md
