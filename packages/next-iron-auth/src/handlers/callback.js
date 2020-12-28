@@ -88,7 +88,7 @@ export default async (req, res, options) => {
 
   const { type: providerType } = provider;
 
-  if (providerType === `email` && action === `login`) {
+  if (providerType === `email` && callbackAction === `login`) {
     try {
       const validationResult = await validateToken({ token, options });
       if (!validationResult) {
@@ -96,7 +96,11 @@ export default async (req, res, options) => {
           req,
           res,
           options,
-          payload: { error: "INVALID_TOKEN", action, provider: path },
+          payload: {
+            error: "INVALID_TOKEN",
+            action: callbackAction,
+            provider: path,
+          },
         });
       }
       const { sendTo, action } = validationResult;
@@ -115,11 +119,12 @@ export default async (req, res, options) => {
       }
       const { account, user } = authResult;
       await signIn({ account, user, options, req });
+      //TODO /profile needs to be an option
       return response({
         req,
         res,
         options,
-        payload: { url: `${options.baseUrl}${options.basePath}/profile` },
+        payload: { url: `${options.baseUrl}/profile` },
       });
     } catch (e) {
       console.error(e);
