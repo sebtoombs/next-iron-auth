@@ -13,5 +13,8 @@
 		"next-iron-session": "^4.1.9",
 		"nodemailer": "^6.4.17",
 		"swr": "^0.3.6"
+	},
+	"np": {
+		"yarn": true
 	}
 }
