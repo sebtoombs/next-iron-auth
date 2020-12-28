@@ -1,0 +1,15 @@
+{
+	"name": "next-iron-auth",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"peerDependencies": {
+		"next": ">=9.0.0"
+	},
+	"dependencies": {
+		"argon2": "^0.27.0",
+		"next-iron-session": "^4.1.9",
+		"nodemailer": "^6.4.17",
+		"swr": "^0.3.6"
+	}
+}
