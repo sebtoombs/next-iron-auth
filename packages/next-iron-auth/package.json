@@ -20,12 +20,17 @@
 		"next": ">=9.0.0"
 	},
 	"dependencies": {
+		"@babel/cli": "^7.12.10",
+		"@babel/core": "^7.12.10",
+		"@babel/preset-env": "^7.12.11",
 		"argon2": "^0.27.0",
 		"next-iron-session": "^4.1.9",
 		"nodemailer": "^6.4.17",
 		"swr": "^0.3.6"
 	},
-	"np": {
-		"yarn": true
+	"scripts": {
+		"build": "babel src --out-dir dist",
+		"watch": "babel --watch src --out-dir dist",
+		"prepublishOnly": "cp ../../README.md README.md && npm run build"
 	}
 }
