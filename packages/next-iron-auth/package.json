@@ -6,6 +6,17 @@
 		"type": "git",
 		"url": "https://github.com/sebtoombs/next-iron-auth"
 	},
+	"main": "dist/index.js",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+			"require":"./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
 	"keywords": [
 		"next",
 		"nextjs",
@@ -14,7 +25,6 @@
 		"nextjs authentication"
 	],
 	"version": "0.0.3",
-	"main": "index.js",
 	"license": "MIT",
 	"peerDependencies": {
 		"next": ">=9.0.0"
@@ -29,7 +39,7 @@
 		"swr": "^0.3.6"
 	},
 	"scripts": {
-		"build": "babel src --out-dir dist",
+		"build": "babel src --root-mode upward -d dist --source-maps",
 		"watch": "babel --watch src --out-dir dist",
 		"prepublishOnly": "cp ../../README.md README.md && npm run build"
 	}
