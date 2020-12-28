@@ -1,3 +1,8 @@
+/**
+ * Frontend lib to handle getting the user/redirecting from protected routes
+ * TODO figure out how to get options.basePath here (instead of /api/auth)
+ */
+
 import { useEffect } from "react";
 import Router from "next/router";
 import useSWR from "swr";
