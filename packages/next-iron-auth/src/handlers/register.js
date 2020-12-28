@@ -6,6 +6,7 @@
 import providers from "../providers";
 import response from "../lib/response";
 import signIn from "../lib/signIn";
+import applyCallback from "../lib/applyCallback";
 
 export default async (req, res, options) => {
   // Get the provider from the query
@@ -72,12 +73,24 @@ export default async (req, res, options) => {
 
     await signIn({ account, user, options, req });
 
-    return response({
-      req,
-      res,
-      options,
-      payload: { url: `${options.baseUrl}${options.basePath}/profile` },
-    });
+    const callbackResponse = await applyCallback(
+      "register::register_redirect",
+      [
+        `${options.baseUrl}/profile`,
+        { account, user, req, res, provider: "credentials" },
+      ],
+      options
+    );
+    if (callbackResponse) {
+      return response({
+        req,
+        res,
+        options,
+        payload: { url: callbackResponse },
+      });
+    } else {
+      return;
+    }
   } catch (error) {
     return response({
       req,

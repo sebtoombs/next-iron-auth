@@ -8,6 +8,7 @@ import providers from "../providers.js";
 import validateToken from "../lib/validateToken";
 import response from "../lib/response";
 import signIn from "../lib/signIn";
+import applyCallback from "../lib/applyCallback";
 
 export default async (req, res, options) => {
   const path = req._auth_path.length > 1 ? req._auth_path[1] : null;
@@ -119,13 +120,24 @@ export default async (req, res, options) => {
       }
       const { account, user } = authResult;
       await signIn({ account, user, options, req });
-      //TODO /profile needs to be an option
-      return response({
-        req,
-        res,
-        options,
-        payload: { url: `${options.baseUrl}/profile` },
-      });
+      const callbackResponse = await applyCallback(
+        "callback::sign_in_redirect",
+        [
+          `${options.baseUrl}/profile`,
+          { account, user, req, res, provider: path },
+        ],
+        options
+      );
+      if (callbackResponse) {
+        return response({
+          req,
+          res,
+          options,
+          payload: { url: callbackResponse },
+        });
+      } else {
+        return;
+      }
     } catch (e) {
       console.error(e);
       return response({
