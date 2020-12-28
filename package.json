@@ -3,12 +3,13 @@
   "private": "true",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "Seb <sebtoombs@gmail.com>",
+  "author": "Seb Toombs <sebtoombs@gmail.com>",
   "license": "MIT",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:app": "next dev packages/test-app",
-    "publish":"cd ./packages/next-iron-auth && np"
+    "prepublish": "cp README.md packages/next-iron-auth/README.md",
+    "publish":"lerna publish"
   },
   "workspaces": [
     "packages/**"
