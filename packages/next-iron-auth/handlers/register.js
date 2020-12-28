@@ -38,7 +38,13 @@ export default async (req, res, options) => {
     );
 
     if (registerErr) {
-      return res.status(401).json({ code: "REGISTER_FAILURE", ...registerErr });
+      return response({
+        req,
+        res,
+        options,
+        payload: { error: registerErr },
+      });
+      // return res.status(401).json({ code: "REGISTER_FAILURE", ...registerErr });
     }
 
     const { account, user } = registerResult;
