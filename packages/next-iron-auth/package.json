@@ -2,8 +2,8 @@
 	"name": "next-iron-auth",
 	"description": "Auth for Next.js using Next Iron Session, inspired by Next-Auth",
 	"repository": {
-  	"type": "git",
-  	"url": "https://github.com/sebtoombs/next-iron-auth"
+		"type": "git",
+		"url": "https://github.com/sebtoombs/next-iron-auth"
 	},
 	"keywords": [
 		"next",
@@ -12,7 +12,7 @@
 		"authentication",
 		"nextjs authentication"
 	],
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"main": "index.js",
 	"license": "MIT",
 	"peerDependencies": {
