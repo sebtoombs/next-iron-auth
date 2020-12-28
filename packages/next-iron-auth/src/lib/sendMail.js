@@ -11,6 +11,11 @@ export default async function sendMail({ to, text, html, subject, options }) {
       html,
     };
 
+    if (process.env._NEXT_IRON_AUTH_DROPMAIL) {
+      logger.debug("SEND_MAIL_DUMMY", mailData);
+      return resolve();
+    }
+
     nodemailer
       .createTransport(process.env.EMAIL_SERVER)
       // .createTransport({
