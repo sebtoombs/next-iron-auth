@@ -27,8 +27,6 @@ export default function response({
     )}`;
   }
 
-  console.log({ responseAsJson, isError, payload, status });
-
   if (responseAsJson) {
     logger.debug("RESPONSE_JSON", payload);
     return res.status(status).json(payload);
