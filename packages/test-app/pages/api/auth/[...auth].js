@@ -160,6 +160,34 @@ const options = {
       passwordResetPath: "/auth/reset-password",
     },
   },
+  //callback: {
+  /**
+   * Override an email template by returning a tuple of {emailSubject,emailText,emailHTML}
+   * Check args.context for context of email, and other info
+   * e.g. args.context = "sendtoken", args.action = "login"/"reset-password"
+   */
+  // email_template: (
+  //   { emailSubject, emailText, emailHTML },
+  //   args,
+  //   options
+  // ) => {},
+  /**
+   * Handle the callback for a custom token
+   * e.g. if lib/sendToken is used in a custom fashion, use this callback to handle the action to take
+   * when a verified response happens.
+   * "action" will be the action specified when sending the token
+   */
+  // ["callback::token"]: ({ req, res, action, sendTo },options) => {},
+  /**
+   * Override the credentials registration redirect/json response.
+   * Return false if doing your own res.{method} within the callback
+   * Return {url: '...'} to return a redirect
+   */
+  // ["register::register_success"]: (
+  //   url,
+  //   { account, user, req, res, provider }
+  // ) => {},
+  //},
 };
 
 export default Auth(options);
