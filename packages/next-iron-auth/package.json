@@ -1,6 +1,10 @@
 {
 	"name": "next-iron-auth",
 	"description": "Auth for Next.js using Next Iron Session, inspired by Next-Auth",
+	"repository": {
+  	"type": "git",
+  	"url": "https://github.com/sebtoombs/next-iron-auth"
+	},
 	"keywords": [
 		"next",
 		"nextjs",
