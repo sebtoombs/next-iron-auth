@@ -71,7 +71,7 @@ export default async function sendToken({
     "email_template",
     [
       { emailSubject, emailText, emailHTML },
-      { url, token, sendTo, action, context: "sendtoken" },
+      { url, token, sendTo, action, context: "sendtoken", provider },
     ],
     options
   ));

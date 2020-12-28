@@ -13,8 +13,11 @@ import applyCallback from "../lib/applyCallback";
 export default async (req, res, options) => {
   const path = req._auth_path.length > 1 ? req._auth_path[1] : null;
 
+  //TODO callback action and token action should be the same thing???
+
   const { action: callbackAction = "", type = "", token = "" } = req.query;
 
+  // Validate custom tokens & credentials registration
   if (!path && type === "token" && callbackAction && token) {
     const validationResult = await validateToken({
       token,
@@ -72,6 +75,14 @@ export default async (req, res, options) => {
           });
         }
       }
+    } else {
+      // Handle custom tokens
+      // Custom tokens must implement some response (res.send, res.json, res.redirect etc)
+      return applyCallback(
+        "callback::token",
+        [{ req, res, action, sendTo }],
+        options
+      );
     }
   }
 
