@@ -4,18 +4,38 @@
  * require a registration step
  */
 import providers from "../providers";
+import response from "../lib/response";
 
 export default async (req, res, options) => {
   // Get the provider from the query
   const { provider = "" } = req.query;
 
-  // For now, must be credentials provider
-  if (provider !== "credentials") {
-    return res.status(400).json({ code: "INVALID_PROVIDER" });
+  if (typeof providers[provider] === `undefined`) {
+    // return res.status(400).json({ code: "PROVIDER_NOT_FOUND" });
+    return response({
+      req,
+      res,
+      options,
+      payload: {
+        error: "PROVIDER_NOT_CONFIGURED",
+        message: "The specified provider is not configured",
+      },
+    });
   }
 
-  if (typeof providers[provider] === `undefined`) {
-    return res.status(400).json({ code: "PROVIDER_NOT_FOUND" });
+  // For now, must be credentials provider
+  if (providers[provider].type !== "credentials") {
+    // return res.status(400).json({ code: "INVALID_PROVIDER" });
+    return response({
+      req,
+      res,
+      options,
+      payload: {
+        error: "INVALID_PROVIDER",
+        message:
+          'Only providers with type "credentials" support the register endpoint.',
+      },
+    });
   }
 
   if (
@@ -58,7 +78,11 @@ export default async (req, res, options) => {
       payload: { url: `${options.baseUrl}${options.basePath}/profile` },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json(error);
+    return response({
+      req,
+      res,
+      options,
+      payload: { error },
+    });
   }
 };
