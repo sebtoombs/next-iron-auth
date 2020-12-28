@@ -13,7 +13,7 @@ function parseAndValidateOptions(options) {
     accountIdKey: "_id",
     userIdKey: "_id",
     tokenExpiry: 1000 * 60 * 10, //10 minutes
-    emailSiteName: `${options.baseUrl.replace(/^https?:\/\//, "")}`,
+    siteName: `${options.baseUrl.replace(/^https?:\/\//, "")}`,
     emailFrom: `"Next-Iron-Auth" <auth@${options.baseUrl}>`,
     destroyUsedToken: true,
   };

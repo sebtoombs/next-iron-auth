@@ -36,10 +36,10 @@ export default async function sendToken({
   )}&action=${action}`;
 
   //Get an email body by context
-  const site = options.emailSiteName;
+  const site = options.siteName;
   var emailText, emailHTML, emailSubject;
   if (action === "login") {
-    emailSubject = `Login to ${options.emailSiteName}`;
+    emailSubject = `Login to ${options.siteName}`;
     emailHTML = emailHtmlLogin({
       url,
       site,
@@ -51,7 +51,7 @@ export default async function sendToken({
       email: sendTo,
     });
   } else if (action === "reset-password") {
-    emailSubject = `Reset password request for ${options.emailSiteName}`;
+    emailSubject = `Reset password request for ${options.siteName}`;
     emailHTML = emailHtmlResetPassword({
       url,
       site,
