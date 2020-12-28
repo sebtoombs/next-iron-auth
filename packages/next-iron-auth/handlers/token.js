@@ -11,9 +11,6 @@ export default async (req, res, options) => {
   const user = req.session.get("user");
 
   const actions = {
-    login: {
-      authenticated: false,
-    },
     "reset-password": {
       authenticated: true,
     },
@@ -33,9 +30,14 @@ export default async (req, res, options) => {
   try {
     await sendToken({ sendTo, action, options });
 
-    // TODO maybe redirect based on option?
-
-    return res.json({});
+    return response({
+      req,
+      res,
+      options,
+      payload: {
+        url: `${options.baseUrl}${options.basePath}/callback/token-sent?action=${action}`,
+      },
+    });
   } catch (e) {
     console.error(error);
     return res.status(500).json(error);
