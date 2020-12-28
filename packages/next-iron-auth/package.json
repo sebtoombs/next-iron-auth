@@ -24,7 +24,7 @@
 		"authentication",
 		"nextjs authentication"
 	],
-	"version": "0.0.4",
+	"version": "0.0.3",
 	"license": "MIT",
 	"peerDependencies": {
 		"next": ">=9.0.0"
