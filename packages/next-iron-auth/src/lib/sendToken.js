@@ -8,6 +8,7 @@ import {
   emailTextResetPassword,
 } from "./emailUtils";
 import logger from "./logger";
+import applyCallback from "./applyCallback";
 
 export default async function sendToken({
   sendTo,
@@ -64,6 +65,17 @@ export default async function sendToken({
     });
   }
 
+  // Allow the emailSubject, email content  to be overridden by user for custom actions
+  // (e.g.) send verification token for sensitive actions, override email content etc
+  ({ emailSubject, emailText, emailHTML } = await applyCallback(
+    "email_template",
+    [
+      { emailSubject, emailText, emailHTML },
+      { url, token, sendTo, action, context: "sendtoken" },
+    ],
+    options
+  ));
+
   await sendMail({
     to: sendTo,
     text: emailText,
@@ -72,7 +84,7 @@ export default async function sendToken({
     options,
   });
 
-  logger.debug("SEND_TOKEN", { url });
+  logger.debug("SEND_TOKEN", { url, sendTo });
 
   return { token, url };
 }
