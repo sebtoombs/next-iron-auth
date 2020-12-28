@@ -55,12 +55,12 @@ export default async function sendToken({
     emailHTML = emailHtmlResetPassword({
       url,
       site,
-      email: sendTo,
+      login: sendTo,
     });
     emailText = emailTextResetPassword({
       url,
       site,
-      email: sendTo,
+      login: sendTo,
     });
   }
 

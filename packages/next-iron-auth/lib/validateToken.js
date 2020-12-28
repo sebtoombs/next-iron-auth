@@ -1,6 +1,10 @@
 import argon2 from "argon2";
 
-export default async function validateToken({ token, options }) {
+export default async function validateToken({
+  token,
+  options,
+  destroyUsedToken = null,
+}) {
   const { hash = false, expires = false, sendTo = false, action = false } =
     (await options.findToken({ token })) || {};
 
@@ -14,7 +18,12 @@ export default async function validateToken({ token, options }) {
 
   const tokenExpired = new Date().getTime() > expires || !expires;
 
-  if (options.destroyUsedToken || tokenExpired) {
+  destroyUsedToken =
+    destroyUsedToken === true || destroyUsedToken === false
+      ? destroyUsedToken
+      : options.destroyToken;
+
+  if (destroyUsedToken || tokenExpired) {
     try {
       await options.destroyToken({ token });
     } catch (e) {

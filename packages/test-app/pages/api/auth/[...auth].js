@@ -83,6 +83,16 @@ const options = {
       });
     });
   },
+  updateAccount: async (id, data) => {
+    return new Promise((resolve, reject) => {
+      db.accounts.update({ _id: id }, { $set: data }, {}, (err, updates) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(updates);
+      });
+    });
+  },
   //userIdKey: "_id",
   findUser: async ({ _id }) => {
     //by is either "id" or "email"
@@ -147,6 +157,7 @@ const options = {
     credentials: {
       // loginKey: 'email' // The key from req.body to look for the login .e.g email or username
       // passwordKey: 'password // The key in req.body to look for the submitted password
+      passwordResetPath: "/auth/reset-password",
     },
   },
 };

@@ -5,6 +5,7 @@
  */
 import providers from "../providers";
 import response from "../lib/response";
+import signIn from "../lib/signIn";
 
 export default async (req, res, options) => {
   // Get the provider from the query

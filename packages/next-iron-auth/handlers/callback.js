@@ -12,7 +12,67 @@ import signIn from "../lib/signIn";
 export default async (req, res, options) => {
   const path = req._auth_path.length > 1 ? req._auth_path[1] : null;
 
-  const { action = "" } = req.query;
+  const { action: callbackAction = "", type = "", token = "" } = req.query;
+
+  if (!path && type === "token" && callbackAction && token) {
+    const validationResult = await validateToken({
+      token,
+      options,
+      destroyUsedToken: req.method === "GET" ? false : null,
+    });
+    if (!validationResult) {
+      return response({
+        req,
+        res,
+        options,
+        payload: {
+          error: "INVALID_TOKEN",
+          action: callbackAction,
+          provider: path,
+        },
+      });
+    }
+    const { sendTo, action } = validationResult;
+    if (action === "reset-password") {
+      if (req.method === "GET") {
+        // Show password reset form
+        return res.redirect(
+          `${options.baseUrl}${options.providers.credentials.passwordResetPath}?token=${token}`
+        );
+      } else if (req.method === "POST") {
+        try {
+          const [passwordResetErr] = await providers.credentials.resetPassword(
+            req,
+            sendTo,
+            options
+          );
+          if (passwordResetErr) {
+            return response({
+              req,
+              res,
+              options,
+              payload: { error: "PASSWORD_RESET", ...passwordResetErr },
+            });
+          }
+          return response({
+            req,
+            res,
+            options,
+            payload: {
+              url: `${options.baseUrl}${options.providers.credentials.passwordResetPath}?action=password-reset`,
+            },
+          });
+        } catch (error) {
+          return response({
+            req,
+            res,
+            options,
+            payload: { error },
+          });
+        }
+      }
+    }
+  }
 
   // For now callbacks are only for providers. This may change
   if (!path || typeof providers[path] === `undefined`) {
@@ -26,10 +86,9 @@ export default async (req, res, options) => {
 
   const provider = providers[path];
 
-  const { type } = provider;
+  const { type: providerType } = provider;
 
-  if (type === `email` && action === `login`) {
-    const { token = "" } = req.query;
+  if (providerType === `email` && action === `login`) {
     try {
       const validationResult = await validateToken({ token, options });
       if (!validationResult) {

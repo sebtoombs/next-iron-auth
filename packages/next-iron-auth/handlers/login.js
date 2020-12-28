@@ -45,7 +45,7 @@ export default async (req, res, options) => {
           req,
           res,
           options,
-          payload: { code: "AUTH_FAILURE", ...authErr },
+          payload: { error: "AUTH_FAILURE", code: authErr },
           code: 401,
         });
       }

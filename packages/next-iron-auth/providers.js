@@ -91,6 +91,37 @@ export default {
   },
   credentials: {
     type: "credentials",
+    resetPassword: async (req, email, options) => {
+      const body = await req.body;
+      const accountIdKey = options.accountIdKey || "_id";
+      const loginKey = options?.providers?.credentials?.loginKey || "email";
+      const loginId = email;
+
+      const login = `credentials:${loginId}`;
+
+      const password =
+        body[options?.providers?.credentials?.passwordKey || "password"];
+
+      if (!password) {
+        return ["PASSWORD_MISSING", null];
+      }
+
+      const account = await options.findAccount({
+        [loginKey]: loginId,
+        login,
+        provider: "credentials",
+      });
+
+      if (!account || account.login !== login) {
+        return ["LOGIN_NOT_FOUND", null];
+      }
+
+      const hash = await argon2.hash(password);
+
+      await options.updateAccount(account[accountIdKey], { hash });
+
+      return [null, true];
+    },
     register: async (req, options) => {
       const body = req.body;
 
