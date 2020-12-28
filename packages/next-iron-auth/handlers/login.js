@@ -26,7 +26,6 @@ export default async (req, res, options) => {
       // Send the email
       const [tokenErr] = await providers[provider].sendToken(req, options);
       if (tokenErr) {
-        console.log(tokenErr);
         return response({ req, res, options, payload: { error: tokenErr } });
       }
       return response({ req, res, options, payload: {} });
