@@ -1,6 +1,7 @@
 import providers from "../providers";
 import response from "../lib/response";
 import signIn from "../lib/signIn";
+import applyCallback from "../lib/applyCallback";
 
 export default async (req, res, options) => {
   // Get the provider from the query
@@ -55,17 +56,34 @@ export default async (req, res, options) => {
       // On success, merge any extra user data into the session cookie
 
       await signIn({ account, user, options, req });
-      return res.status(200).send({ done: true });
+      const callbackResponse = await applyCallback(
+        "callback::sign_in_success",
+        [
+          `${options.baseUrl}/profile`,
+          { account, user, req, res, provider: path },
+        ],
+        options
+      );
+      if (callbackResponse) {
+        return response({
+          req,
+          res,
+          options,
+          payload: { url: callbackResponse },
+        });
+      } else {
+        return;
+      }
     } catch (error) {
       console.error(error);
-      return res.status(500).json(error);
+      return response({
+        req,
+        res,
+        options,
+        payload: { error: e },
+      });
     }
   } else {
-    return response({
-      req,
-      res,
-      options,
-      payload: `${options.baseUrl}${options.basePath}/signin`,
-    });
+    return res.status(404).send();
   }
 };
