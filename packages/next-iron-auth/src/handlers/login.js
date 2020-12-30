@@ -58,10 +58,7 @@ export default async (req, res, options) => {
       await signIn({ account, user, options, req });
       const callbackResponse = await applyCallback(
         "callback::sign_in_success",
-        [
-          `${options.baseUrl}/profile`,
-          { account, user, req, res, provider: path },
-        ],
+        [`${options.baseUrl}/profile`, { account, user, req, res, provider }],
         options
       );
       if (callbackResponse) {
@@ -80,7 +77,7 @@ export default async (req, res, options) => {
         req,
         res,
         options,
-        payload: { error: e },
+        payload: { error },
       });
     }
   } else {
