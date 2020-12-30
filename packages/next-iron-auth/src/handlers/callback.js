@@ -132,7 +132,7 @@ export default async (req, res, options) => {
       const { account, user } = authResult;
       await signIn({ account, user, options, req });
       const callbackResponse = await applyCallback(
-        "callback::sign_in_redirect",
+        "callback::sign_in_success",
         [
           `${options.baseUrl}/profile`,
           { account, user, req, res, provider: path },
