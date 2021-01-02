@@ -134,7 +134,7 @@ export default async (req, res, options) => {
       const callbackResponse = await applyCallback(
         "callback::sign_in_success",
         [
-          `${options.baseUrl}/profile`,
+          { url: `${options.baseUrl}/profile` },
           { account, user, req, res, provider: path },
         ],
         options
@@ -144,7 +144,7 @@ export default async (req, res, options) => {
           req,
           res,
           options,
-          payload: { url: callbackResponse },
+          payload: callbackResponse,
         });
       } else {
         return;
