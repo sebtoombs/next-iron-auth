@@ -1,8 +1,10 @@
 import argon2 from "argon2";
 import sendToken from "./lib/sendToken";
+import applyCallback from "./lib/applyCallback";
 
 /**
  * Create a new user and account, possibly trigger account verification if required
+ * Alternatively, link a new auth method if possible
  */
 async function registerUser(
   { req, provider, providerId, verified = false },
@@ -67,8 +69,18 @@ async function registerUser(
 
   if (!user) {
     try {
+      await applyCallback(
+        "register::before_create_user",
+        [{ req, provider, providerId, verified, userData }],
+        options
+      );
       user = await options.createUser(userData);
       userCreated = true;
+      await applyCallback(
+        "register::after_create_user",
+        [{ req, provider, providerId, verified, user }],
+        options
+      );
     } catch (e) {
       return ["CREATE_USER_ERROR", e];
     }
@@ -92,6 +104,12 @@ async function registerUser(
   } catch (e) {
     return ["CREATE_ACCOUNT_ERROR", e];
   }
+
+  await applyCallback(
+    "register::after_register",
+    [{ req, provider, providerId, verified, user, account, userCreated }],
+    options
+  );
 
   return [null, { account, user, userCreated }];
 }
