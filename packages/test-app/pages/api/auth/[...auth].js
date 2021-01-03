@@ -153,11 +153,14 @@ const options = {
     email: {
       // loginKey: 'email'
       // tokenKey: 'token'
+      accountRequired: true,
+      // signInOnRegister: true,
     },
     credentials: {
       // loginKey: 'email' // The key from req.body to look for the login .e.g email or username
       // passwordKey: 'password // The key in req.body to look for the submitted password
       passwordResetPath: "/auth/reset-password",
+      // signInOnRegister: true,
     },
   },
   callback: {

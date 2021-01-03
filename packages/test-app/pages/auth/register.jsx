@@ -12,34 +12,40 @@ const Register = () => {
     redirectIfFound: true,
   });
 
-  async function doRegister(e) {
-    e.preventDefault();
+  function doRegister(providerId) {
+    return async (e) => {
+      e.preventDefault();
 
-    const body = {
-      email: e.currentTarget.email.value,
-      password: e.currentTarget.password.value,
+      const body = {
+        email: e.currentTarget.email.value,
+        json: true,
+      };
+
+      if (providerId === "credentials") {
+        body.password = e.currentTarget.password.value;
+      }
+
+      try {
+        const r = await mutateUser(
+          fetchJson(`/api/auth/register?provider=${providerId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          })
+        );
+        console.log(r);
+        // router.push("/profile");
+      } catch (error) {
+        console.error("An unexpected error happened:", error);
+      }
     };
-
-    try {
-      const r = await mutateUser(
-        fetchJson("/api/auth/register?provider=credentials", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        })
-      );
-      console.log(r);
-      // router.push("/profile");
-    } catch (error) {
-      console.error("An unexpected error happened:", error);
-    }
   }
 
   return (
     <div>
       <div className="login">
         <p>Register email and password</p>
-        <form onSubmit={doRegister}>
+        <form onSubmit={doRegister("credentials")}>
           <label>
             <span>Email</span>
             <input type="email" name="email" required />
@@ -47,6 +53,17 @@ const Register = () => {
           <label>
             <span>Password</span>
             <input type="password" name="password" required />
+          </label>
+          <button type="submit">Register</button>
+        </form>
+      </div>
+
+      <div className="login">
+        <p>Register with email</p>
+        <form onSubmit={doRegister("email")}>
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" required />
           </label>
           <button type="submit">Register</button>
         </form>

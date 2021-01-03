@@ -25,8 +25,10 @@ export default async (req, res, options) => {
     });
   }
 
-  // For now, must be credentials provider
-  if (providers[provider].type !== "credentials") {
+  const providerType = providers[provider].type;
+
+  // For now, must be credentials or email provider
+  if (providerType !== "credentials" && providerType !== "email") {
     // return res.status(400).json({ code: "INVALID_PROVIDER" });
     return response({
       req,
@@ -35,7 +37,7 @@ export default async (req, res, options) => {
       payload: {
         error: "INVALID_PROVIDER",
         message:
-          'Only providers with type "credentials" support the register endpoint.',
+          'Only providers with type "credentials" or "email" support the register endpoint.',
       },
     });
   }
@@ -71,13 +73,20 @@ export default async (req, res, options) => {
 
     const { account, user } = registerResult;
 
-    await signIn({ account, user, options, req });
+    if (options.providers[provider]?.signInOnRegister !== false) {
+      if (providerType === "credentials") {
+        await signIn({ account, user, options, req });
+      }
+      if (providerType === "email") {
+        const [tokenErr] = await providers[provider].sendToken(req, options);
+      }
+    }
 
     const callbackResponse = await applyCallback(
       "register::register_success",
       [
         { url: `${options.baseUrl}/profile` },
-        { account, user, req, res, provider: "credentials" },
+        { account, user, req, res, provider },
       ],
       options
     );

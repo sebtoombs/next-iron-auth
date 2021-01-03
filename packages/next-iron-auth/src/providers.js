@@ -1,6 +1,101 @@
 import argon2 from "argon2";
 import sendToken from "./lib/sendToken";
 
+/**
+ * Create a new user and account, possibly trigger account verification if required
+ */
+async function registerUser(
+  { req, provider, providerId, verified = false },
+  options
+) {
+  const body = req.body;
+
+  const loginKey = options?.providers?.[providerId]?.loginKey || "email";
+  const loginId = body[loginKey];
+
+  let userCreated = false; // WAs a user created or linked?
+  let hash; //password hash for credentials
+
+  if (!loginId) {
+    return ["LOGIN_MISSING", null];
+  }
+
+  // Create the login string
+  const login = `${providerId}:${loginId}`;
+
+  // Try to find existing account
+  let account = await options.findAccount({
+    [loginKey]: loginId,
+    login,
+    provider: providerId,
+  });
+
+  if (account && account.login === login) {
+    return ["LOGIN_EXISTS", null];
+  }
+
+  const userData = {
+    ...body,
+    login,
+    [loginKey]: loginId,
+    provider: providerId,
+    verified: false,
+  };
+
+  if (provider.type === "credentials") {
+    // Get the password
+    const passwordKey =
+      options?.providers?.credentials?.passwordKey || "password";
+    const password = body[passwordKey];
+
+    if (!password) {
+      return ["PASSWORD_MISSING", null];
+    }
+    hash = await argon2.hash(password);
+    delete userData[passwordKey];
+  }
+
+  let user =
+    typeof options.linkUser === `function`
+      ? await options.linkUser({
+          ...body,
+          login,
+          [loginKey]: loginId,
+          provider: "credentials",
+        })
+      : null;
+
+  if (!user) {
+    try {
+      user = await options.createUser(userData);
+      userCreated = true;
+    } catch (e) {
+      return ["CREATE_USER_ERROR", e];
+    }
+  }
+
+  if (!user[options.userIdKey]) {
+    return ["INVALID_USER_OBJECT", null];
+  }
+
+  const accountData = {
+    [loginKey]: body[loginKey],
+    login,
+    userId: user[options.userIdKey],
+    provider: "credentials",
+    hash: hash ? hash : null,
+    verified,
+  };
+
+  try {
+    account = await options.createAccount(accountData);
+  } catch (e) {
+    return ["CREATE_ACCOUNT_ERROR", e];
+  }
+
+  return [null, { account, user, userCreated }];
+}
+
 export default {
   email: {
     type: "email",
@@ -15,8 +110,36 @@ export default {
         return ["LOGIN_MISSING", null];
       }
 
-      // Create the login string
-      // const login = `email:${loginId}`;
+      const accountRequired =
+        options?.providers?.email?.accountRequired === true;
+
+      if (accountRequired) {
+        // Create the login string
+        const login = `email:${loginId}`;
+
+        // TRy to find an account
+        const account = await options.findAccount({
+          [loginKey]: loginId,
+          login,
+          provider: "email",
+        });
+
+        // Maybe link account
+        if (!account) {
+          const user =
+            typeof options.linkUser === `function`
+              ? await options.linkUser({
+                  login,
+                  [loginKey]: loginId,
+                  provider: "email",
+                })
+              : null;
+
+          if (!user) {
+            return ["ACCOUNT_REQUIRED", null];
+          }
+        }
+      }
 
       await sendToken({
         sendTo: loginId,
@@ -54,9 +177,7 @@ export default {
         user = await options.findUser({
           [options.userIdKey]: account.userId,
         });
-      }
-
-      if (!user) {
+      } else {
         user =
           typeof options.linkUser === `function`
             ? await options.linkUser({
@@ -66,6 +187,15 @@ export default {
               })
             : null;
       }
+
+      // We might want to let existing users link an account via email
+      // but not allow new users via email
+      const canCreateUser = options?.providers?.email?.accountRequired !== true;
+
+      if (!user && !canCreateUser) {
+        return ["ACCOUNT_REQUIRED", null];
+      }
+
       if (!user) {
         const userData = {
           login,
@@ -86,7 +216,26 @@ export default {
         account = await options.createAccount(accountData);
       }
 
+      if (!account) {
+        return ["ACCOUNT_REQUIRED", null];
+      }
+      if (!user) {
+        //TODO log this somewhere, it should never happen!
+        return ["CORRUPTED_ACCOUNT", null];
+      }
+
       return [null, { account, user }];
+    },
+    register: async (req, options) => {
+      return registerUser(
+        {
+          req,
+          provider: { type: "email" },
+          providerId: "email",
+          verified: false,
+        },
+        options
+      );
     },
   },
   credentials: {
@@ -123,73 +272,15 @@ export default {
       return [null, true];
     },
     register: async (req, options) => {
-      const body = req.body;
-
-      const loginKey = options?.providers?.credentials?.loginKey || "email";
-      const loginId = body[loginKey];
-
-      if (!loginId) {
-        return ["LOGIN_MISSING", null];
-      }
-
-      // Create the login string
-      const login = `credentials:${loginId}`;
-
-      // Get the password
-      const passwordKey =
-        options?.providers?.credentials?.passwordKey || "password";
-      const password = body[passwordKey];
-
-      if (!password) {
-        return ["PASSWORD_MISSING", null];
-      }
-
-      let account = await options.findAccount({
-        [loginKey]: loginId,
-        login,
-        provider: "credentials",
-      });
-
-      if (account && account.login === login) {
-        return ["LOGIN_EXISTS", null];
-      }
-
-      const hash = await argon2.hash(password);
-
-      const userData = {
-        ...body,
-        login,
-        [loginKey]: loginId,
-        provider: "credentials",
-        verified: false,
-      };
-      delete userData[passwordKey];
-
-      let user =
-        typeof options.linkUser === `function`
-          ? await options.linkUser({
-              ...body,
-              login,
-              [loginKey]: loginId,
-              provider: "credentials",
-            })
-          : null;
-      if (!user) user = await options.createUser(userData);
-
-      if (!user[options.userIdKey]) {
-        return ["INVALID_USER_OBJECT", null];
-      }
-
-      const accountData = {
-        [loginKey]: body[loginKey],
-        login,
-        userId: user[options.userIdKey],
-        provider: "credentials",
-        hash,
-      };
-      account = await options.createAccount(accountData);
-
-      return [null, { account, user }];
+      return registerUser(
+        {
+          req,
+          provider: { type: "credentials" },
+          providerId: "credentials",
+          verified: false,
+        },
+        options
+      );
     },
     authenticate: async (req, options) => {
       const body = req.body;
