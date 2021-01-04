@@ -29,7 +29,7 @@ export default async (req, res, options) => {
   if (actions[action].authenticated === true && !user) {
     return res.status(403).json({ code: "NOT_AUTHENTICATED" });
   }
-  if (actions[action].authenticated !== true && user) {
+  if (actions[action].authenticated === true && user) {
     return res.status(400).json({ code: "AUTHENTICATED" });
   }
 
