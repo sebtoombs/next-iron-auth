@@ -1,4 +1,4 @@
-import argon2 from "argon2";
+import verifyHash from "./verifyHash";
 
 export default async function validateToken({
   token,
@@ -12,7 +12,7 @@ export default async function validateToken({
     return false;
   }
 
-  if (!(await argon2.verify(hash, token))) {
+  if (!(await verifyHash(hash, token))) {
     return false;
   }
 

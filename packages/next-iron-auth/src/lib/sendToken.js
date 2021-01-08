@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import argon2 from "argon2";
+import hashPassword from "./hashPassword";
 import sendMail from "./sendMail";
 import {
   emailHtmlLogin,
@@ -19,7 +19,7 @@ export default async function sendToken({
   // Create a token
   const token = randomBytes(32).toString("hex");
 
-  const hash = await argon2.hash(token);
+  const hash = await hashPassword(token);
 
   // Store the token
   await options.storeToken({

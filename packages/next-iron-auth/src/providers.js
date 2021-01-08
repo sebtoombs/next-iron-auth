@@ -1,6 +1,7 @@
-import argon2 from "argon2";
 import sendToken from "./lib/sendToken";
 import applyCallback from "./lib/applyCallback";
+import hashPassword from "./lib/hashPassword";
+import verifyPassword from "./lib/verifyHash";
 
 /**
  * Create a new user and account, possibly trigger account verification if required
@@ -53,7 +54,7 @@ async function registerUser(
     if (!password) {
       return ["PASSWORD_MISSING", null];
     }
-    hash = await argon2.hash(password);
+    hash = await hashPassword(password);
     delete userData[passwordKey];
   }
 
@@ -230,6 +231,7 @@ export default {
           login,
           userId: user[options.userIdKey],
           provider: "email",
+          verified: true,
         };
         account = await options.createAccount(accountData);
       }
@@ -283,7 +285,7 @@ export default {
         return ["LOGIN_NOT_FOUND", null];
       }
 
-      const hash = await argon2.hash(password);
+      const hash = await hashPassword(password);
 
       await options.updateAccount(account[accountIdKey], { hash });
 
@@ -334,7 +336,7 @@ export default {
       }
 
       // Verify the password
-      if (!account.hash || !(await argon2.verify(account.hash, password))) {
+      if (!account.hash || !(await verifyHash(account.hash, password))) {
         return ["PASSWORD_MISMATCH", null]; // TODO Maybe send LOGN_NOT_FOUND unless process.env.NODE_ENV is dev/debug?
       }
 
