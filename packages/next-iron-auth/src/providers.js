@@ -1,7 +1,7 @@
 import sendToken from "./lib/sendToken";
 import applyCallback from "./lib/applyCallback";
 import hashPassword from "./lib/hashPassword";
-import verifyPassword from "./lib/verifyHash";
+import verifyHash from "./lib/verifyHash";
 
 /**
  * Create a new user and account, possibly trigger account verification if required
