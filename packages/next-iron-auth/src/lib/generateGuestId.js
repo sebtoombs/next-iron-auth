@@ -1,4 +1,4 @@
-export default function tempID({ prefix = "guest_" }) {
+export default function tempID({ prefix = "guest_" } = {}) {
   return (
     prefix +
     new Date().getTime().toString(16) +
