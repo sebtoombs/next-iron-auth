@@ -16,5 +16,6 @@ export default async function signIn({ account, user, options, req }) {
     login: account.login,
   };
   req.session.set("user", sessionData);
+  req.session.unset("guest");
   await req.session.save();
 }

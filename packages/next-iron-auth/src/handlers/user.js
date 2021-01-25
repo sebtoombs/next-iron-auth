@@ -1,3 +1,5 @@
+import generateGuestId from "../lib/generateGuestId";
+
 export default async (req, res, options) => {
   const user = req.session.get("user");
   if (user) {
@@ -8,8 +10,14 @@ export default async (req, res, options) => {
       ...user,
     });
   } else {
+    const guest = req.session.get("guest");
+    if (!guest) {
+      req.session.set("guest", generateGuestId());
+      await req.session.save();
+    }
     res.json({
       isLoggedIn: false,
+      guest,
     });
   }
 };
