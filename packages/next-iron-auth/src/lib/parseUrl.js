@@ -1,7 +1,7 @@
 // from next-auth
 export default (url) => {
   // Default values
-  const defaultHost = "http://localhost:3000";
+  const defaultHost = "localhost:3000";
   const defaultPath = "/api/auth";
 
   if (!url) {
