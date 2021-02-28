@@ -54,6 +54,18 @@ async function registerUser(
     if (!password) {
       return ["PASSWORD_MISSING", null];
     }
+
+    if (
+      typeof options?.providers?.credentials?.validatePassword === "function"
+    ) {
+      const validationResponse = await options.providers.credentials.validatePassword(
+        password
+      );
+      if (validationResponse !== true) {
+        return ["PASSWORD_INVALID", validationResponse];
+      }
+    }
+
     hash = await hashPassword(password);
     delete userData[passwordKey];
   }
